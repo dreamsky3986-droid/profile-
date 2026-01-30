@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DZ Payment - QR Centered Download</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000;
+            color: white;
+            margin: 0;
+            overflow-y: auto; 
+            min-height: 100vh;
+        }
+
+        /* Latar Belakang Kustom */
+        .main-wrapper {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), 
+                              url('https://lh3.googleusercontent.com/d/18R2dt1oIjHCzCrw98jLg7CT0MIobAcU-');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 15px;
+        }
+
+        /* Header 3D */
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 0 10px rgba(30, 64, 175, 0.8));
+        }
+
+        .text-style-3d {
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: clamp(1.1rem, 4.5vw, 2rem);
+            letter-spacing: -1px;
+            color: #FFFFFF;
+            line-height: 1;
+            text-shadow: 
+                1px 1px 0px #1e3a8a, 
+                2px 2px 0px #1e3a8a, 
+                0px 0px 15px rgba(30, 58, 138, 0.8);
+        }
+
+        /* Switcher Navigasi */
+        .switch-container {
+            width: 100%;
+            max-width: 280px;
+            height: 44px;
+            background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%);
+            border-radius: 12px;
+            padding: 4px;
+            display: flex;
+            position: relative;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .switch-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            z-index: 10;
+            color: white;
+        }
+
+        .switch-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: #0f172a;
+            border-radius: 9px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .pos-qris { transform: translateX(0); }
+        .pos-transfer { transform: translateX(100%); }
+
+        /* Kotak Transparan Utama */
+        .transparent-content-box {
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* QR Section */
+        .qr-display-container {
+            position: relative;
+            width: 190px;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .qr-image {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        /* Tombol Unduh Kecil & Tengah */
+        .btn-download-qr {
+            margin-top: 10px;
+            background: #3b82f6;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1.5px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-download-qr:hover {
+            transform: scale(1.1);
+            background: #2563eb;
+        }
+
+        .btn-download-qr:active {
+            transform: scale(0.9);
+        }
+
+        /* Transfer List */
+        .transfer-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bank-name {
+            font-size: 9px;
+            font-weight: 800;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: block;
+            text-align: left;
+        }
+
+        .account-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 800;
+            color: white;
+        }
+
+        /* Tombol Confirm Independent */
+        .confirm-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 30px;
+        }
+
+        .btn-wa-custom {
+            width: 100%;
+            max-width: 180px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-wa-custom:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-wa-image {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+        }
+
+        .hidden { display: none; }
+        
+        .footer-tag {
+            font-size: 7px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            background: #2563eb;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 800;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast uppercase italic tracking-wider">Berhasil!</div>
+
+    <div class="main-wrapper">
+        
+        <!-- Header -->
+        <header class="header-section">
+            <div class="logo-box">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 20H50C70 20 85 35 85 50C85 66 70 80 50 80H20V20Z" fill="#1e40af" />
+                    <path d="M35 35H65L35 65H65" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h1 class="text-style-3d">DZ PAYMENT</h1>
+        </header>
+
+        <!-- Tab Navigasi -->
+        <nav class="switch-container">
+            <div id="slider" class="switch-slider pos-qris"></div>
+            <div class="switch-option" onclick="toggleView('qris')">QRIS</div>
+            <div class="switch-option" onclick="toggleView('transfer')">TRANSFER</div>
+        </nav>
+
+        <!-- Wadah Transparan -->
+        <main class="transparent-content-box">
+            
+            <!-- Tampilan QRIS -->
+            <div id="view-qris">
+                <div class="qr-display-container">
+                    <img id="qr-img-source" src="https://lh3.googleusercontent.com/d/1hJ0DJ6HokAZ1plLtSCoZYUn-z895ppjw" alt="QR Code" class="qr-image">
+                    
+                    <!-- Tombol Unduh (Kecil & Tengah) -->
+                    <div class="btn-download-qr" onclick="downloadQR()" title="Simpan QR">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    </div>
+                </div>
+                <h2 class="text-xs font-black uppercase italic tracking-widest text-blue-400">Scan QR Code</h2>
+                <p class="text-white/60 text-[8.5px] mt-1 px-4 leading-relaxed">
+                    Klik tombol biru di bawah QR untuk menyimpan kode ke galeri.
+                </p>
+            </div>
+
+            <!-- Tampilan Transfer -->
+            <div id="view-transfer" class="hidden">
+                <div class="space-y-1">
+                    <div class="transfer-item">
+                        <div class="flex-1">
+                            <span class="bank-name">GOPAY</span>
+                            <span class="account-number" id="num-gopay">089659455151</span>
+                        </div>
+                        <button onclick="copyToClipboard('num-gopay')" class="text-blue-400 p-2">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="transfer-item">
+                        <div class="flex-1">
+                            <span class="bank-name">DANA</span>
+                            <span class="account-number" id="num-dana">089659455151</span>
+                        </div>
+                        <button onclick="copyToClipboard('num-dana')" class="text-blue-400 p-2">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="transfer-item">
+                        <div class="flex-1">
+                            <span class="bank-name">SEABANK</span>
+                            <span class="account-number" id="num-seabank">901140827973</span>
+                        </div>
+                        <button onclick="copyToClipboard('num-seabank')" class="text-blue-400 p-2">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Tombol Konfirmasi -->
+        <div class="confirm-wrapper">
+            <a href="https://wa.me/6281918084897?text=Halo%20saya%20sudah%20membayar" 
+               target="_blank" 
+               class="btn-wa-custom">
+                <img src="https://lh3.googleusercontent.com/d/1hrTCOl47gU0bRoXI68Lsa0KkyrHYYAA6" 
+                     alt="Konfirmasi Pembayaran" class="btn-wa-image">
+            </a>
+        </div>
+
+        <div class="footer-tag">DZ Gateway Security</div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleView(type) {
+            const slider = document.getElementById('slider');
+            const qris = document.getElementById('view-qris');
+            const transfer = document.getElementById('view-transfer');
+
+            if (type === 'qris') {
+                slider.className = 'switch-slider pos-qris';
+                qris.classList.remove('hidden');
+                transfer.classList.add('hidden');
+            } else {
+                slider.className = 'switch-slider pos-transfer';
+                qris.classList.add('hidden');
+                transfer.classList.remove('hidden');
+            }
+        }
+
+        function copyToClipboard(id) {
+            const val = document.getElementById(id).innerText;
+            const el = document.createElement('textarea');
+            el.value = val;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast("Nomor Berhasil Disalin!");
+        }
+
+        function downloadQR() {
+            const imgSrc = document.getElementById('qr-img-source').src;
+            window.open(imgSrc, '_blank');
+            showToast("Membuka Gambar QR...");
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 2000);
+        }
+    </script>
+</body>
+  </html>
